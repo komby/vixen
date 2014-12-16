@@ -39,6 +39,7 @@ using WeifenLuo.WinFormsUI.Docking;
 using Element = Common.Controls.Timeline.Element;
 using Timer = System.Windows.Forms.Timer;
 using VixenModules.Property.Color;
+using VixenModules.SequenceType.Timed;
 
 
 namespace VixenModules.Editor.TimedSequenceEditor
@@ -184,6 +185,8 @@ namespace VixenModules.Editor.TimedSequenceEditor
 				return GridForm;
 			else if (persistString == typeof(Form_Marks).ToString())
 				return MarksForm;
+            else if (persistString == typeof(Form_SavedEffects).ToString())
+                return SavedEffectsForm;
 			else if (persistString == typeof(Form_ToolPalette).ToString())
 				return ToolsForm;
 			else
@@ -211,6 +214,7 @@ namespace VixenModules.Editor.TimedSequenceEditor
 				ToolsForm.Show(dockPanel, DockState.DockLeft);
 				MarksForm.Show(dockPanel, DockState.DockLeft);
 				EffectsForm.Show(dockPanel, DockState.DockLeft);
+                SavedEffectsForm.Show(dockPanel, DockState.DockLeft);
 			}
 
 			XMLProfileSettings xml = new XMLProfileSettings();
@@ -513,6 +517,23 @@ namespace VixenModules.Editor.TimedSequenceEditor
 			}
 		}
 
+        private Form_SavedEffects _savedEffectsForm = null;
+        public Form_SavedEffects SavedEffectsForm
+        {
+            get
+            {
+                if (_savedEffectsForm != null && !_savedEffectsForm.IsDisposed)
+                {
+                    return _savedEffectsForm;
+                }
+                else
+                {
+                    _savedEffectsForm = new Form_SavedEffects(TimelineControl);
+                    return _savedEffectsForm;
+                }
+            }
+        }
+
 		private Form_ToolPalette _toolPaletteForm = null;
 		public Form_ToolPalette ToolsForm
 		{
@@ -797,7 +818,11 @@ namespace VixenModules.Editor.TimedSequenceEditor
 
 				MarksForm.Sequence = _sequence;
 				MarksForm.PopulateMarkCollectionsList(null);
+               
 				PopulateMarkSnapTimes();
+
+                SavedEffectsForm.Sequence = _sequence;
+                SavedEffectsForm.PopulateSavedEffectsCollectionsList(null);
 
 				if (_sequence.TimePerPixel > TimeSpan.Zero )
 				{
@@ -3254,8 +3279,8 @@ namespace VixenModules.Editor.TimedSequenceEditor
 
 					int relativeVisibleRow = rownum - result.FirstVisibleRow;
 
-					TimelineElementsClipboardData.EffectModelCandidate modelCandidate =
-						new TimelineElementsClipboardData.EffectModelCandidate(((TimedSequenceElement)elem).EffectNode.Effect)
+					EffectModelCandidate modelCandidate =
+						new EffectModelCandidate(((TimedSequenceElement)elem).EffectNode.Effect)
 							{
 								Duration = elem.Duration,
 								StartTime = elem.StartTime
@@ -3323,9 +3348,9 @@ namespace VixenModules.Editor.TimedSequenceEditor
 			List<Row> visibleRows = new List<Row>(TimelineControl.VisibleRows);
 			int topTargetRoxIndex = visibleRows.IndexOf(targetRow);
 			List<EffectNode> nodesToAdd = new List<EffectNode>();
-			foreach (KeyValuePair<TimelineElementsClipboardData.EffectModelCandidate, int> kvp in data.EffectModelCandidates)
+			foreach (KeyValuePair<EffectModelCandidate, int> kvp in data.EffectModelCandidates)
 			{
-				TimelineElementsClipboardData.EffectModelCandidate effectModelCandidate = kvp.Key;
+				EffectModelCandidate effectModelCandidate = kvp.Key;
 				int relativeRow = kvp.Value;
 
 				int targetRowIndex = topTargetRoxIndex + relativeRow;
@@ -3726,6 +3751,40 @@ namespace VixenModules.Editor.TimedSequenceEditor
 				MarksForm.Close();
 			}
 		}
+        
+        //private void markWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        //{
+        //    if (MarksForm.DockState == DockState.Unknown)
+        //    {
+        //        DockState dockState = MarksForm.DockState;
+        //        dockState = DockState.DockLeft;
+        //        if (dockState == DockState.Unknown) dockState = DockState.DockLeft;
+        //        MarksForm.Show(dockPanel, dockState);
+        //        //We have to re-subscribe to the event handlers
+        //        EffectsForm.EscapeDrawMode += EscapeDrawMode;
+        //    }
+        //    else
+        //    {
+        //        MarksForm.Close();
+        //    }
+        //}
+
+        private void savedEffectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (SavedEffectsForm.DockState == DockState.Unknown)
+            {
+                DockState dockState = SavedEffectsForm.DockState;
+                dockState = DockState.DockLeft;
+                if (dockState == DockState.Unknown) dockState = DockState.DockLeft;
+                SavedEffectsForm.Show(dockPanel, dockState);
+                //We have to re-subscribe to the event handlers
+                EffectsForm.EscapeDrawMode += EscapeDrawMode;
+            }
+            else
+            {
+                SavedEffectsForm.Close();
+            }
+        }
 
 		private void toolWindowToolStripMenuItem_Click(object sender, EventArgs e)
 		{
@@ -4000,6 +4059,7 @@ namespace VixenModules.Editor.TimedSequenceEditor
 			
 			dockPanel.SaveAsXml(settingsPath);
 			MarksForm.Close();
+            SavedEffectsForm.Close();
 			EffectsForm.Close();
 
 			var xml = new XMLProfileSettings();
@@ -4264,6 +4324,7 @@ namespace VixenModules.Editor.TimedSequenceEditor
 			effectWindowToolStripMenuItem.Checked = (EffectsForm.DockState != DockState.Unknown);
 			markWindowToolStripMenuItem.Checked = (MarksForm.DockState != DockState.Unknown);
 			toolWindowToolStripMenuItem.Checked = (ToolsForm.DockState != DockState.Unknown);
+            savedEffectWindowToolStripMenuItem.Checked = (SavedEffectsForm.DockState != DockState.Unknown);
 		}
 
 		private void timerPostponePlay_Tick(object sender, EventArgs e)
@@ -4402,8 +4463,8 @@ namespace VixenModules.Editor.TimedSequenceEditor
                         ((LipSync)effect).LyricData = phoneme.LyricData;
 
                         TimeSpan startTime = TimeSpan.FromMilliseconds(phoneme.StartMS);
-                        TimelineElementsClipboardData.EffectModelCandidate modelCandidate =
-                              new TimelineElementsClipboardData.EffectModelCandidate(effect)
+                       EffectModelCandidate modelCandidate =
+                              new EffectModelCandidate(effect)
                               {
                                   Duration = TimeSpan.FromMilliseconds(phoneme.DurationMS - 1),
                                   StartTime = startTime,
@@ -4463,8 +4524,8 @@ namespace VixenModules.Editor.TimedSequenceEditor
                     ((LipSync)effect).StaticPhoneme = data.Phoneme.ToString().ToUpper();
                     ((LipSync)effect).LyricData = data.LyricData;
 
-                    TimelineElementsClipboardData.EffectModelCandidate modelCandidate =
-                          new TimelineElementsClipboardData.EffectModelCandidate(effect)
+                    EffectModelCandidate modelCandidate =
+                          new EffectModelCandidate(effect)
                           {
                               Duration = data.Duration,
                               StartTime = data.StartOffset
@@ -4613,38 +4674,38 @@ namespace VixenModules.Editor.TimedSequenceEditor
 
 		public TimeSpan EarliestStartTime { get; set; }
 
-		/// <summary>
-		/// Class to hold effect data to allow it to be placed on the clipboard and be reconstructed when later pasted
-		/// </summary>
-		[Serializable]
-		public class EffectModelCandidate
-		{
-			private readonly Type _moduleDataClass;
-			private readonly MemoryStream _effectData;
+        /// <summary>
+        /// Class to hold effect data to allow it to be placed on the clipboard and be reconstructed when later pasted
+        /// </summary>
+        //[Serializable]
+        //public class EffectModelCandidate
+        //{
+        //    private readonly Type _moduleDataClass;
+        //    private readonly MemoryStream _effectData;
 
-			public EffectModelCandidate(IEffectModuleInstance effect)
-			{
-				_moduleDataClass = effect.Descriptor.ModuleDataClass;
-				DataContractSerializer ds = new DataContractSerializer(_moduleDataClass);
+        //    public EffectModelCandidate(IEffectModuleInstance effect)
+        //    {
+        //        _moduleDataClass = effect.Descriptor.ModuleDataClass;
+        //        DataContractSerializer ds = new DataContractSerializer(_moduleDataClass);
 
-				TypeId = effect.Descriptor.TypeId;
-				_effectData = new MemoryStream();
-				using (XmlDictionaryWriter w = XmlDictionaryWriter.CreateBinaryWriter(_effectData))
-					ds.WriteObject(w, effect.ModuleData);
-			}
+        //        TypeId = effect.Descriptor.TypeId;
+        //        _effectData = new MemoryStream();
+        //        using (XmlDictionaryWriter w = XmlDictionaryWriter.CreateBinaryWriter(_effectData))
+        //            ds.WriteObject(w, effect.ModuleData);
+        //    }
 
-			public TimeSpan StartTime { get; set; }
-			public TimeSpan Duration { get; set; }
-			public Guid TypeId { get; private set; }
+        //    public TimeSpan StartTime { get; set; }
+        //    public TimeSpan Duration { get; set; }
+        //    public Guid TypeId { get; private set; }
 
-			public IModuleDataModel GetEffectData()
-			{
-				DataContractSerializer ds = new DataContractSerializer(_moduleDataClass);
-				MemoryStream effectDataIn = new MemoryStream(_effectData.ToArray());
-				using (XmlDictionaryReader r = XmlDictionaryReader.CreateBinaryReader(effectDataIn, XmlDictionaryReaderQuotas.Max))
-					return (IModuleDataModel) ds.ReadObject(r);
-			}
-		}
+        //    public IModuleDataModel GetEffectData()
+        //    {
+        //        DataContractSerializer ds = new DataContractSerializer(_moduleDataClass);
+        //        MemoryStream effectDataIn = new MemoryStream(_effectData.ToArray());
+        //        using (XmlDictionaryReader r = XmlDictionaryReader.CreateBinaryReader(effectDataIn, XmlDictionaryReaderQuotas.Max))
+        //            return (IModuleDataModel) ds.ReadObject(r);
+        //    }
+        //}
 	}
 
 	public class TimeFormats

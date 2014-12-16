@@ -115,6 +115,7 @@ namespace VixenModules.Editor.TimedSequenceEditor
 			this.toolStripMenuItem_RIColor_White = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem_RIColor_Red = new System.Windows.Forms.ToolStripMenuItem();
 			this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.savedEffectWindowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem_zoomTimeIn = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem_zoomTimeOut = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripMenuItem_zoomRowsIn = new System.Windows.Forms.ToolStripMenuItem();
@@ -904,6 +905,7 @@ namespace VixenModules.Editor.TimedSequenceEditor
             this.toolStripMenuItem1,
             this.effectWindowToolStripMenuItem,
             this.markWindowToolStripMenuItem,
+            this.savedEffectWindowToolStripMenuItem,
             this.toolWindowToolStripMenuItem});
 			this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
 			this.viewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
@@ -965,6 +967,14 @@ namespace VixenModules.Editor.TimedSequenceEditor
 			this.markWindowToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
 			this.markWindowToolStripMenuItem.Text = "Mark Window";
 			this.markWindowToolStripMenuItem.Click += new System.EventHandler(this.markWindowToolStripMenuItem_Click);
+            // 
+            // savedEffectsWindowToolStripMenuItem
+            // 
+            this.savedEffectWindowToolStripMenuItem.Name = "savedEffectWindowToolStripMenuItem";
+            this.savedEffectWindowToolStripMenuItem.Size = new System.Drawing.Size(234, 22);
+            this.savedEffectWindowToolStripMenuItem.Text = "Saved Effects Window";
+            this.savedEffectWindowToolStripMenuItem.Click += new System.EventHandler(this.savedEffectToolStripMenuItem_Click);
+
 			// 
 			// toolWindowToolStripMenuItem
 			// 
@@ -1388,6 +1398,11 @@ namespace VixenModules.Editor.TimedSequenceEditor
 
 		}
 
+        //private void savedEffectWindowToolStripMenuItem_Click(object sender, EventArgs e)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
 		#endregion
 
 		private Common.Controls.ToolStripEx toolStripOperations;
@@ -1461,6 +1476,7 @@ namespace VixenModules.Editor.TimedSequenceEditor
 		private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
 		private System.Windows.Forms.ToolStripMenuItem effectWindowToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem markWindowToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem savedEffectWindowToolStripMenuItem;
 		private System.Windows.Forms.ToolStripButton toolStripButton_SnapTo;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;

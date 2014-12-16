@@ -23,5 +23,11 @@ namespace VixenModules.Sequence.Timed
 			get { return ((TimedSequenceData) SequenceData).TimePerPixel; }
 			set { ((TimedSequenceData)SequenceData).TimePerPixel = value; }
 		}
-	}
+
+        public List<SavedEffectsCollection> SavedEffectsCollections
+        {
+            get { return ((TimedSequenceData)SequenceData).SavedEffectsCollections; }
+            set { ((TimedSequenceData)SequenceData).SavedEffectsCollections = value; }
+        }
+    }
 }

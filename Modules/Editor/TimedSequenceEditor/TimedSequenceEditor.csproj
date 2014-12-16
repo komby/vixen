@@ -119,6 +119,12 @@
     <Compile Include="Form_AddMultipleEffects.Designer.cs">
       <DependentUpon>Form_AddMultipleEffects.cs</DependentUpon>
     </Compile>
+    <Compile Include="Form_SavedEffects.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form_SavedEffects.Designer.cs">
+      <DependentUpon>Form_SavedEffects.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form_Marks.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -229,6 +235,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form_AddMultipleEffects.resx">
       <DependentUpon>Form_AddMultipleEffects.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form_SavedEffects.resx">
+      <DependentUpon>Form_SavedEffects.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form_Marks.resx">
       <DependentUpon>Form_Marks.cs</DependentUpon>
